@@ -15,4 +15,13 @@ public interface IComponentLifetime
     /// <param name="mostNestedVisibleScope">The most nested visible scope.</param>
     /// <returns>The scope for the component.</returns>
     ISharingLifetimeScope FindScope(ISharingLifetimeScope mostNestedVisibleScope);
+
+    /// <summary>
+    /// Given the most nested scope visible within the resolve operation, find
+    /// the scope for the component.
+    /// </summary>
+    /// <param name="mostNestedVisibleScope">The most nested visible scope.</param>
+    /// <param name="scope">The output scope, if any.</param>
+    /// <returns>The scope for the component.</returns>
+    bool TryFindScope(ISharingLifetimeScope mostNestedVisibleScope, [MaybeNullWhen(false)] out ISharingLifetimeScope scope);
 }

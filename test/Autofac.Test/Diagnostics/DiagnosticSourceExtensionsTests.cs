@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Diagnostics;
 using Autofac.Core;
 using Autofac.Core.Resolving;
 using Autofac.Core.Resolving.Pipeline;
 using Autofac.Diagnostics;
+using System.Diagnostics;
 
 namespace Autofac.Test.Diagnostics;
 
@@ -169,7 +169,7 @@ public class DiagnosticSourceExtensionsTests
     {
         var operation = MockResolveOperation();
         var request = MockResolveRequest();
-        return new DefaultResolveRequestContext(operation, request, operation.CurrentScope, operation.DiagnosticSource);
+        return new DefaultResolveRequestContext(operation, request, operation.CurrentScope, operation.DiagnosticSource, true);
     }
 
     private class MockSubscriber : DiagnosticTracerBase

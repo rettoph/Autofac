@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+
 namespace Autofac.Core.Lifetime;
 
 /// <summary>
@@ -27,5 +28,19 @@ public class RootScopeLifetime : IComponentLifetime
         }
 
         return mostNestedVisibleScope.RootLifetimeScope;
+    }
+
+    /// <summary>
+    /// Given the most nested scope visible within the resolve operation, find
+    /// the scope for the component.
+    /// </summary>
+    /// <param name="mostNestedVisibleScope">The most nested visible scope.</param>
+    /// <param name="scope">The output scope, if any.</param>
+    /// <returns>The scope for the component.</returns>
+    public bool TryFindScope(ISharingLifetimeScope mostNestedVisibleScope, [MaybeNullWhen(false)] out ISharingLifetimeScope scope)
+    {
+        scope = mostNestedVisibleScope.RootLifetimeScope;
+
+        return scope is not null;
     }
 }

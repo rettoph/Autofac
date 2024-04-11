@@ -23,11 +23,14 @@ internal sealed class DefaultResolveRequestContext : ResolveRequestContext
     /// <param name="diagnosticSource">
     /// The <see cref="System.Diagnostics.DiagnosticListener" /> to which trace events should be written.
     /// </param>
+    /// <param name="required">whether or not resolving instance is required.<summary>
+    /// </summary></param>
     internal DefaultResolveRequestContext(
         IResolveOperation owningOperation,
         in ResolveRequest request,
         ISharingLifetimeScope scope,
-        DiagnosticListener diagnosticSource)
+        DiagnosticListener diagnosticSource,
+        bool required)
     {
         Operation = owningOperation;
         ActivationScope = scope;
@@ -35,6 +38,7 @@ internal sealed class DefaultResolveRequestContext : ResolveRequestContext
         _resolveRequest = request;
         PhaseReached = PipelinePhase.ResolveRequestStart;
         DiagnosticSource = diagnosticSource;
+        Required = required;
     }
 
     /// <inheritdoc />
@@ -82,6 +86,9 @@ internal sealed class DefaultResolveRequestContext : ResolveRequestContext
     public override DecoratorContext? DecoratorContext { get; set; }
 
     /// <inheritdoc />
+    public override bool Required { get; protected set; }
+
+    /// <inheritdoc />
     public override void ChangeScope(ISharingLifetimeScope newScope) =>
         ActivationScope = newScope ?? throw new ArgumentNullException(nameof(newScope));
 
@@ -92,6 +99,10 @@ internal sealed class DefaultResolveRequestContext : ResolveRequestContext
     /// <inheritdoc />
     public override object ResolveComponent(in ResolveRequest request) =>
         Operation.GetOrCreateInstance(ActivationScope, request);
+
+    /// <inheritdoc />
+    public override bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object? component)
+        => Operation.TryGetOrCreateInstance(ActivationScope, in request, out component);
 
     /// <summary>
     /// Complete the request, raising any appropriate events.

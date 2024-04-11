@@ -145,6 +145,12 @@ public class Container : Disposable, IContainer, IServiceProvider
         return _rootLifetimeScope.ResolveComponent(request);
     }
 
+    /// <inheritdoc />
+    public bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object? component)
+    {
+        return _rootLifetimeScope.TryResolveComponent(in request, out component);
+    }
+
     /// <summary>
     /// Releases unmanaged and - optionally - managed resources.
     /// </summary>

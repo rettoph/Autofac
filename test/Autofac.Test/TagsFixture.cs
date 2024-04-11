@@ -54,7 +54,25 @@ public class TagsFixture
         var coll = inner.Resolve<IList<object>>();
         Assert.Single(coll);
 
-        Assert.Throws<DependencyResolutionException>(() => outer.Resolve<IList<object>>());
+        var col2 = outer.Resolve<IList<object>>();
+        Assert.Empty(col2);
+    }
+
+    [Fact]
+    public void EnumerablesAreTaggable()
+    {
+        var builder = new ContainerBuilder();
+        builder.RegisterType<object>()
+            .InstancePerMatchingLifetimeScope("tag");
+
+        var outer = builder.Build();
+        var inner = outer.BeginLifetimeScope("tag");
+
+        var enuml = inner.Resolve<IEnumerable<object>>();
+        Assert.Single(enuml);
+
+        var enum2 = outer.Resolve<IEnumerable<object>>();
+        Assert.Empty(enum2);
     }
 
     [Fact]

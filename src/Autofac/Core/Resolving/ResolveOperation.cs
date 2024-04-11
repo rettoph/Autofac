@@ -95,13 +95,25 @@ internal sealed class ResolveOperation : IDependencyTrackingResolveOperation
     /// <inheritdoc />
     public object GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, in ResolveRequest request)
     {
+        return this.GetOrCreateInstance(currentOperationScope, in request, true)!;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetOrCreateInstance(ISharingLifetimeScope currentOperationScope, in ResolveRequest request, [MaybeNullWhen(false)] out object? instance)
+    {
+        instance = this.GetOrCreateInstance(currentOperationScope, in request, false);
+        return instance is not null;
+    }
+
+    private object? GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, in ResolveRequest request, bool required)
+    {
         if (_ended)
         {
             throw new ObjectDisposedException(ResolveOperationResources.TemporaryContextDisposed, innerException: null);
         }
 
         // Create a new request context.
-        var requestContext = new DefaultResolveRequestContext(this, request, currentOperationScope, DiagnosticSource);
+        var requestContext = new DefaultResolveRequestContext(this, request, currentOperationScope, DiagnosticSource, required);
 
         // Raise our request-beginning event.
         var handler = ResolveRequestBeginning;
@@ -124,12 +136,12 @@ internal sealed class ResolveOperation : IDependencyTrackingResolveOperation
             if (DiagnosticSource.IsEnabled())
             {
                 DiagnosticSource.RequestStart(this, requestContext);
-                InvokePipeline(request, requestContext);
+                InvokePipeline(request, requestContext, required);
                 DiagnosticSource.RequestSuccess(this, requestContext);
             }
             else
             {
-                InvokePipeline(request, requestContext);
+                InvokePipeline(request, requestContext, required);
             }
         }
         catch (Exception ex)
@@ -228,10 +240,10 @@ internal sealed class ResolveOperation : IDependencyTrackingResolveOperation
     /// to enable it to be optionally surrounded with diagnostics.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void InvokePipeline(in ResolveRequest request, DefaultResolveRequestContext requestContext)
+    private void InvokePipeline(in ResolveRequest request, DefaultResolveRequestContext requestContext, bool required)
     {
         request.ResolvePipeline.Invoke(requestContext);
-        if (requestContext.Instance == null)
+        if (requestContext.Instance == null && required == true)
         {
             throw new DependencyResolutionException(ResolveOperationResources.PipelineCompletedWithNoInstance);
         }

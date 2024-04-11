@@ -73,6 +73,11 @@ public abstract class ResolveRequestContext : IComponentContext
     public abstract DecoratorContext? DecoratorContext { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether or not resolving <see cref="Instance"/> is required.
+    /// </summary>
+    public abstract bool Required { get; protected set; }
+
+    /// <summary>
     /// Provides an event that will fire when the current request completes.
     /// Requests will only be considered 'complete' when the overall <see cref="IResolveOperation"/> is completing.
     /// </summary>
@@ -96,4 +101,7 @@ public abstract class ResolveRequestContext : IComponentContext
 
     /// <inheritdoc/>
     public abstract object ResolveComponent(in ResolveRequest request);
+
+    /// <inheritdoc/>
+    public abstract bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object? component);
 }

@@ -1,14 +1,15 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Diagnostics;
-using System.Runtime.Loader;
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Core.Resolving;
 using Autofac.Core.Resolving.Middleware;
 using Autofac.Core.Resolving.Pipeline;
 using Autofac.Features.Decorators;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Loader;
 
 namespace Autofac.Test.Core.Pipeline;
 
@@ -483,7 +484,11 @@ public class PipelineBuilderTests
 
         public override IComponentRegistry ComponentRegistry => ActivationScope.ComponentRegistry;
 
+        public override bool Required { get; protected set; }
+
         public override object ResolveComponent(in ResolveRequest request) => throw new NotImplementedException();
+
+        public override bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object component) => throw new NotImplementedException();
     }
 
     private class LifetimeScopeStub : ISharingLifetimeScope
@@ -567,6 +572,11 @@ public class PipelineBuilderTests
         }
 
         public object ResolveComponent(in ResolveRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object component)
         {
             throw new NotImplementedException();
         }

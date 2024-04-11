@@ -11,7 +11,6 @@ using System.Runtime.Loader;
 using Autofac.Builder;
 using Autofac.Core.Registration;
 using Autofac.Core.Resolving;
-using Autofac.Features.Collections;
 using Autofac.Util;
 
 namespace Autofac.Core.Lifetime;
@@ -331,6 +330,19 @@ public class LifetimeScope : Disposable, ISharingLifetimeScope, IServiceProvider
         var handler = ResolveOperationBeginning;
         handler?.Invoke(this, new ResolveOperationBeginningEventArgs(operation));
         return operation.Execute(request);
+    }
+
+    /// <inheritdoc />
+    public bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object? component)
+    {
+        CheckNotDisposed();
+
+        var operation = new ResolveOperation(this, DiagnosticSource);
+        var handler = ResolveOperationBeginning;
+        handler?.Invoke(this, new ResolveOperationBeginningEventArgs(operation));
+        component = operation.Execute(request);
+
+        return component is not null;
     }
 
     /// <summary>

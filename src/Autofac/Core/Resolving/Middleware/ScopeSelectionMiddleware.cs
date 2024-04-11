@@ -30,7 +30,20 @@ internal class ScopeSelectionMiddleware : IResolveMiddleware
     {
         try
         {
-            context.ChangeScope(context.Registration.Lifetime.FindScope(context.ActivationScope));
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            if (context.Required)
+            {
+                context.ChangeScope(context.Registration.Lifetime.FindScope(context.ActivationScope));
+            }
+            else if (context.Registration.Lifetime.TryFindScope(context.ActivationScope, out ISharingLifetimeScope? scope))
+            {
+                context.ChangeScope(scope);
+            }
+            else
+            {
+                return;
+            }
+#pragma warning restore CA2000 // Dispose objects before losing scope
         }
         catch (DependencyResolutionException ex)
         {

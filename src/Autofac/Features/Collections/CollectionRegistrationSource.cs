@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Collections;
-using System.Linq.Expressions;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Activators.Delegate;
@@ -11,6 +9,8 @@ using Autofac.Core.Registration;
 using Autofac.Features.Decorators;
 using Autofac.Util;
 using Autofac.Util.Cache;
+using System.Collections;
+using System.Linq.Expressions;
 
 namespace Autofac.Features.Collections;
 
@@ -85,7 +85,7 @@ internal class CollectionRegistrationSource : IRegistrationSource, IPerScopeRegi
             {
                 elementType = serviceType.GenericTypeArguments[0];
                 limitType = elementType.MakeArrayType();
-                factory = GenerateArrayFactory(elementType);
+                factory = GenerateListFactory(elementType);
             }
             else if (serviceType.IsArray)
             {
@@ -128,12 +128,13 @@ internal class CollectionRegistrationSource : IRegistrationSource, IPerScopeRegi
                 {
                     var itemRegistration = itemRegistrations[i];
                     var resolveRequest = new ResolveRequest(elementTypeService, itemRegistration, p);
-                    var component = c.ResolveComponent(resolveRequest);
+
                     if (isFixedSize)
                     {
+                        var component = c.ResolveComponent(resolveRequest);
                         output[i] = component;
                     }
-                    else
+                    else if (c.TryResolveComponent(resolveRequest, out var component))
                     {
                         output.Add(component);
                     }

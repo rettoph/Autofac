@@ -28,4 +28,16 @@ public interface IComponentContext
     /// <exception cref="ComponentNotRegisteredException"/>
     /// <exception cref="DependencyResolutionException"/>
     object ResolveComponent(in ResolveRequest request);
+
+    /// <summary>
+    /// Attempt to resolve an instance of the provided registration within the context.
+    /// </summary>
+    /// <param name="request">The resolve request.</param>
+    /// <param name="component">The component instance.</param>
+    /// <returns>
+    /// The component instance.
+    /// </returns>
+    /// <exception cref="ComponentNotRegisteredException"/>
+    /// <exception cref="DependencyResolutionException"/>
+    bool TryResolveComponent(in ResolveRequest request, [MaybeNullWhen(false)] out object? component);
 }

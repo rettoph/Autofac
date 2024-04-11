@@ -68,4 +68,53 @@ public class MatchingScopeLifetimeTests
         var tag2Scope = (ISharingLifetimeScope)container.BeginLifetimeScope(tag2);
         Assert.Equal(tag2Scope, msl.FindScope(tag2Scope));
     }
+
+    [Fact]
+    public void WhenTryNoMatchingScopeIsPresent_ReturnsNull()
+    {
+        var container = Factory.CreateEmptyContainer();
+        const string tag = "abcdefg";
+        var msl = new MatchingScopeLifetime(tag);
+        var rootScope = (ISharingLifetimeScope)container.Resolve<ILifetimeScope>();
+
+        var result = msl.TryFindScope(rootScope, out var scope);
+
+        Assert.False(result);
+        Assert.Null(scope);
+    }
+
+    [Fact]
+    public void TryMatchesAgainstSingleTaggedScope()
+    {
+        const string tag = "Tag";
+        var msl = new MatchingScopeLifetime(tag);
+        var container = Factory.CreateEmptyContainer();
+        var lifetimeScope = (ISharingLifetimeScope)container.BeginLifetimeScope(tag);
+
+        var result = msl.TryFindScope(lifetimeScope, out var scope);
+
+        Assert.True(result);
+        Assert.Equal(lifetimeScope, scope);
+    }
+
+    [Fact]
+    public void TryMatchesAgainstMultipleTaggedScopes()
+    {
+        const string tag1 = "Tag1";
+        const string tag2 = "Tag2";
+
+        var msl = new MatchingScopeLifetime(tag1, tag2);
+        var container = Factory.CreateEmptyContainer();
+
+
+        var tag1Scope = (ISharingLifetimeScope)container.BeginLifetimeScope(tag1);
+        var result1 = msl.TryFindScope(tag1Scope, out var scope1);
+        Assert.True(result1);
+        Assert.Equal(tag1Scope, scope1);
+
+        var tag2Scope = (ISharingLifetimeScope)container.BeginLifetimeScope(tag2);
+        var result2 = msl.TryFindScope(tag2Scope, out var scope2);
+        Assert.True(result2);
+        Assert.Equal(tag2Scope, scope2);
+    }
 }

@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Diagnostics.CodeAnalysis;
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Core.Resolving;
 using Autofac.Core.Resolving.Pipeline;
-using Autofac.Util.Cache;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Autofac.Test;
 
@@ -50,7 +49,8 @@ public static class ActivatorPipelineExtensions
                 new ResolveOperation(lifetimeScope, lifetimeScope.DiagnosticSource),
                 new ResolveRequest(new TypedService(typeof(T)), Mocks.GetResolvableImplementation(), parameters),
                 lifetimeScope,
-                lifetimeScope.DiagnosticSource);
+                lifetimeScope.DiagnosticSource,
+                true);
 
             built.Invoke(request);
 

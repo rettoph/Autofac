@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Diagnostics;
 using Autofac.Core.Resolving.Pipeline;
+using System.Diagnostics;
 
 namespace Autofac.Core.Resolving;
 
@@ -60,4 +60,13 @@ public interface IResolveOperation
     /// <param name="request">The resolve request.</param>
     /// <returns>The component instance.</returns>
     object GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, in ResolveRequest request);
+
+    /// <summary>
+    /// Attempt to get or create and share an instance of the requested service in the <paramref name="currentOperationScope"/>.
+    /// </summary>
+    /// <param name="currentOperationScope">The scope in the hierarchy in which the operation will begin.</param>
+    /// <param name="request">The resolve request.</param>
+    /// <param name="instance">The resolved instance, if any.</param>
+    /// <returns>Whether or not an instance was retrieved.</returns>
+    bool TryGetOrCreateInstance(ISharingLifetimeScope currentOperationScope, in ResolveRequest request, [MaybeNullWhen(false)] out object? instance);
 }
