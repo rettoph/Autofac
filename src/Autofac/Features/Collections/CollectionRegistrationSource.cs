@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Collections;
+using System.Linq.Expressions;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Activators.Delegate;
@@ -9,8 +11,6 @@ using Autofac.Core.Registration;
 using Autofac.Features.Decorators;
 using Autofac.Util;
 using Autofac.Util.Cache;
-using System.Collections;
-using System.Linq.Expressions;
 
 namespace Autofac.Features.Collections;
 
@@ -84,7 +84,7 @@ internal class CollectionRegistrationSource : IRegistrationSource, IPerScopeRegi
             if (serviceType.IsGenericTypeDefinedBy(typeof(IEnumerable<>)))
             {
                 elementType = serviceType.GenericTypeArguments[0];
-                limitType = elementType.MakeArrayType();
+                limitType = typeof(List<>).MakeGenericType(elementType);
                 factory = GenerateListFactory(elementType);
             }
             else if (serviceType.IsArray)
